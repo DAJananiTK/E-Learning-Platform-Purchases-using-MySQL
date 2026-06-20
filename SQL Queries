@@ -64,6 +64,9 @@ VALUES
  select * from learners;
 
 
+
+
+
 INSERT INTO courses
 VALUES
 (101, 'Java Programming', 'Programming', 599.99),
@@ -291,6 +294,10 @@ left join
 purchases p
 on c.course_id=p.course_id
 where p.course_id is null;
+
+
+
+
 
 
 
