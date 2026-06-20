@@ -1,0 +1,306 @@
+-- Tasks
+-- 1. Create the database and schema. Populate the Schema:
+-- Create a Database for this project and
+-- Create all three tables in MySQL with appropriate data types and relationships.
+-- Insert sample data covering at least:
+-- 4–5 learners
+-- 4–5 courses (spread across multiple categories)
+-- 6–8 purchase records
+
+
+create database online_learning_db;
+use online_learning_db;
+
+
+create table learners
+(
+learner_id  int primary key,
+full_name varchar(100) not null,
+country varchar(50)
+);
+
+
+
+create table courses
+(
+course_id int primary key,
+course_name varchar(100) not null,
+category varchar(50),
+unit_price decimal(10,2)
+
+);
+
+
+create table purchases
+(
+purchase_id int primary key,
+learner_id int,
+course_id int,
+quantity int,
+purchase_date date,
+foreign key (learner_id) references learners(learner_id),
+foreign key (course_id) references courses(course_id)
+);
+
+INSERT INTO learners
+VALUES
+(1, 'Rahul Verma', 'India'),
+(2, 'Sophia Brown', 'Canada'),
+(3, 'Karthik Raj', 'India'),
+(4, 'Olivia Wilson', 'Australia'),
+(5, 'Daniel Lee', 'Singapore'),
+(6, 'Aisha Khan', 'UAE'),
+(7, 'Michael Scott', 'USA'),
+(8, 'Neha Patel', 'India'),
+(9, 'Ethan Miller', 'UK'),
+(10, 'Sara Ahmed', 'Egypt'),
+(11, 'John David', 'USA'),
+(12, 'Priya Sharma', 'India'),
+(13, 'Emma Watson', 'UK');
+ 
+ 
+ 
+ 
+ select * from learners;
+
+
+INSERT INTO courses
+VALUES
+(101, 'Java Programming', 'Programming', 599.99),
+(102, 'Power BI Essentials', 'Data Analytics', 799.99),
+(103, 'Social Media Marketing', 'Marketing', 899.99),
+(104, 'UI UX Design', 'Design', 999.99),
+(105, 'MySQL Fundamentals', 'Database', 699.99),
+(106, 'Python for Data Science', 'Programming', 1099.99),
+(107, 'Advanced Excel', 'Data Analytics', 649.99),
+(108, 'Cyber Security Basics', 'Security', 1199.99),
+(109, 'Cloud Computing', 'Technology', 1299.99),
+(110, 'Machine Learning Intro', 'AI', 1499.99),
+(111, 'Blockchain Basics', 'Technology', 1999.99),
+(112, 'Digital Marketing Pro', 'Marketing', 1499.99),
+(113, 'Tableau Masterclass', 'Data Analytics', 1299.99);
+
+select * from courses;
+
+INSERT INTO purchases
+VALUES
+(1001, 1, 101, 1, '2026-05-01'),
+(1002, 2, 103, 2, '2026-05-02'),
+(1003, 3, 105, 1, '2026-05-03'),
+(1004, 4, 102, 3, '2026-05-04'),
+(1005, 5, 104, 1, '2026-05-05'),
+(1006, 6, 106, 2, '2026-05-06'),
+(1007, 7, 108, 1, '2026-05-07'),
+(1008, 8, 110, 1, '2026-05-08'),
+(1009, 9, 107, 2, '2026-05-09'),
+(1010, 10, 109, 1, '2026-05-10'),
+(1011, 1, 102, 2, '2026-05-11'),
+(1012, 3, 106, 1, '2026-05-12'),
+(1013, 5, 101, 3, '2026-05-13'),
+(1014, 7, 104, 1, '2026-05-14'),
+(1015, 9, 110, 2, '2026-05-15');
+
+select * from learners;
+select * from courses;
+select * from purchases;
+
+-- 2. Data Exploration Using Joins
+		 -- Data Presentation Guidelines for the following query 
+-- Format currency values to 2 decimal places.
+-- Use aliases for column names (e.g., AS total_revenue).
+-- Sort results appropriately (e.g., highest total_spent first).
+-- Use SQL INNER JOIN, LEFT JOIN, and RIGHT JOIN to:
+-- Combine learner, course, and purchase data.
+-- Display each learner’s purchase details (course name, category, quantity, total amount, and purchase date).
+
+-- inner join --
+
+
+SELECT 
+    l.learner_id,
+    l.full_name as learner_name,
+    l.country,
+    c.course_name,
+    c.category,
+    p.quantity,
+    FORMAT(c.unit_price, 2) AS unit_price,
+    FORMAT(p.quantity * c.unit_price, 2) AS total_amount,
+    p.purchase_date
+FROM purchases p
+INNER JOIN learners l
+    ON p.learner_id = l.learner_id
+INNER JOIN courses c
+    ON p.course_id = c.course_id
+ORDER BY (p.quantity * c.unit_price) DESC;
+
+
+-- left join-- 
+select 
+l.learner_id,
+l.full_name as learner_name,
+l.country,
+c.course_name,
+c.category,
+p.quantity,
+format(c.unit_price,2) as unit_price,
+format(p.quantity*c.unit_price,2) as total_amount,
+p.purchase_date
+from learners l
+left join purchases p
+on l.learner_id= p.learner_id
+left join courses c
+on p.course_id=c.course_id 
+order by l.full_name;
+
+
+-- right join--
+select 
+c.course_name,
+c.category,
+p.quantity,
+format(c.unit_price,2) as unit_price,
+format(p.quantity*c.unit_price,2) as total_amount,
+p.purchase_date
+from purchases p
+right join courses c
+on p.course_id= c.course_id
+left join learners l
+on p.learner_id=l.learner_id 
+order by c.course_name;
+
+select * from learners;
+select * from courses;
+select * from purchases;
+
+
+-- analytical queries --
+--  Display each learner’s total spending (quantity × unit_price) along with their country.
+
+with learner_total_spending as
+(
+select
+l.learner_id,
+l.full_name as learner_name,
+l.country,
+sum(p.quantity*c.unit_price) as total_spending
+from learners l
+inner join
+purchases p
+on l.learner_id=p.learner_id 
+inner join
+courses c
+on p.course_id=c.course_id
+group by l.learner_id,l.full_name,l.country
+)
+select 
+learner_id,
+learner_name,
+country,
+format(total_spending,2) as total_spending
+from learner_total_spending
+order by total_spending desc;
+
+select * from learners;
+select * from courses;
+select * from purchases;
+
+-- Find the top 3 most purchased courses based on total quantity sold.
+
+select
+    course_name,
+    category,
+    total_quantity_sold
+
+from
+(
+    select
+        c.course_name,
+        c.category,
+        SUM(p.quantity) as total_quantity_sold
+        from courses c
+
+		inner join purchases p
+        on c.course_id = p.course_id
+       group by  c.course_name, c.category
+
+) as course_sales
+order by total_quantity_sold desc
+limit 3;
+
+-- 3.each course category total revenue and number of unique learners who purchased from that category --
+with category_revenue as
+(
+select 
+c.category ,
+sum(p.quantity*c.unit_price) as total_revenue,
+count(distinct p.learner_id) as unique_learners
+from courses c
+inner join purchases p 
+on c.course_id=p.course_id 
+group by c.category
+) 
+select category,
+format(total_revenue,2) as final_total_revenue,
+unique_learners
+from category_revenue
+order by total_revenue desc;
+
+
+select * from learners;
+select * from courses;
+select * from purchases;
+
+
+-- 4. show  the learner purchased course from more than one category --
+
+
+select learner_name,
+ country,
+ total_categories
+ from
+ (
+ select 
+ l.full_name as learner_name,
+ country,
+ count(distinct c.category) as total_categories
+ from learners l
+ join purchases p
+ on l.learner_id=p.learner_id 
+ join
+ courses c 
+ on p.course_id=c.course_id
+ group by l.full_name,l.country
+ )
+ as multi_purchase
+ having total_categories>1;
+ 
+-- 5.  Identify courses that have not been purchased at all.
+
+
+select * from learners;
+select * from courses;
+select * from purchases;
+
+select c.course_id,
+c.course_name,
+c.category,
+format(unit_price,2) as unit_price
+from
+courses c 
+left join 
+purchases p
+on c.course_id=p.course_id
+where p.course_id is null;
+
+
+
+
+
+
+
+
+
+
+
+
+
