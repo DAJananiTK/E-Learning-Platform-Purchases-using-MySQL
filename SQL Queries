@@ -58,14 +58,7 @@ VALUES
 (12, 'Priya Sharma', 'India'),
 (13, 'Emma Watson', 'UK');
  
- 
- 
- 
  select * from learners;
-
-
-
-
 
 INSERT INTO courses
 VALUES
@@ -294,15 +287,6 @@ left join
 purchases p
 on c.course_id=p.course_id
 where p.course_id is null;
-
-
-
-
-
-
-
-
-
 
 
 
