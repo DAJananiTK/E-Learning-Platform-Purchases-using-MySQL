@@ -170,7 +170,7 @@ select * from purchases;
 
 
 -- analytical queries --
---  Display each learner’s total spending (quantity × unit_price) along with their country.
+--  1.  Display each learner’s total spending (quantity × unit_price) along with their country.
 
 with learner_total_spending as
 (
@@ -200,7 +200,7 @@ select * from learners;
 select * from courses;
 select * from purchases;
 
--- Find the top 3 most purchased courses based on total quantity sold.
+-- 2.  Find the top 3 most purchased courses based on total quantity sold.
 
 select
     course_name,
